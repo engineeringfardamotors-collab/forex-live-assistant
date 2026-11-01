@@ -1,0 +1,22 @@
+# ── محرمانه / احراز هویت — هرگز وارد گیت نشود ──
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+assistant_listener.session*
+browser_profile/
+
+# ── داده‌ی محلی — فقط در ZIP پشتیبان محلی، نه در گیت ──
+session_data/
+logs/
+
+# ── محیط مجازی و کش‌ها ──
+.venv*/
+__pycache__/
+*.pyc
+*.pyo
+
+# ── بسته‌ها و پشتیبان‌ها ──
+*.zip
+backups/

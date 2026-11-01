@@ -1,0 +1,161 @@
+# نسخه‌ی نمونه — شناسه‌ها و کلیدها پاک شده‌اند؛ مقادیر خودتان را بگذارید.
+# پیکربندی فعال — کلیدهای واقعی را اینجا یا در متغیرهای محیطی بگذارید
+
+telegram:
+  bot_token: ""            # از @BotFather (یا BOT_TOKEN در .env)
+  signal_channel: "-1000000000000"   # Live Trading Time Signal
+  api_id: 0                # از my.telegram.org
+  api_hash: ""
+  phone: ""
+  session_name: "assistant_listener"
+  watch_groups:            # محل ارسال لینک جلسات
+    - "-1000000000000"     # Trading Time GOLD VIP - Group Buy
+  admin_chat: ""           # کانال/چت خصوصی ادمین (خطاها، بازبینی با دکمه‌ی تأیید). ربات باید عضو/ادمین باشد
+
+network:
+  proxy: ""                # خالی = اتصال مستقیم/TUN. مثال: socks5://127.0.0.1:10808 یا http://127.0.0.1:12334
+
+publisher:
+  dry_run: true               # «true» = هیچ پیامی به کانال واقعی نمی‌رود (فقط لاگ) — قبل از جلسه‌ی رسمی false کنید
+  delay_note_sec: 60       # اگر پیام دیرتر از این رسید، زمان اصلی در آن درج می‌شود
+  drop_after_sec: 3600     # پیام کانال کهنه‌تر از این ارسال نمی‌شود (فقط به ادمین)
+
+health:
+  check_interval_sec: 5
+  black_after_sec: 30        # تصویر سیاه/یکدست بیش از این = هشدار
+  frozen_after_sec: 30       # تصویر ثابت بیش از این = هشدار
+  move_tolerance_px: 8       # تلورانس جابه‌جایی پنجره
+  prevent_sleep: true        # در طول جلسه ویندوز به خواب نرود و نمایشگر خاموش نشود
+
+meeting:
+  zoom_password: ""
+  display_name: "Assistant"
+  use_browser: true
+  headless: false
+  join_timeout_sec: 45
+  manual_wait_sec: 600
+  user_data_dir: "./browser_profile"   # پروفایل ماندگار کروم برای ورود پایدارتر
+  browser_channel: ""                  # chrome / msedge / خالی=خودکار
+  reconnect:                           # قطعی جلسه → ورود مجدد خودکار (بخش ۲۲-۶ مستندات)
+    enabled: true
+    max_attempts: 3                    # سهمیه پس از ۱۰ دقیقه پایداری تازه می‌شود
+    wait_sec: 20                       # انتظار پیش از تلاش مجدد
+    manual_join_wait_sec: 45           # مهلت ورود دستی در تلاش مجدد
+
+capture:
+  screenshot_interval_sec: 30
+  max_frames_per_analysis: 6
+  audio_sample_rate: 16000
+  audio_chunk_sec: 10      # قطعه‌ی کوتاه‌تر = واکنش سریع‌تر به گفتار سیگنال
+  audio_overlap_sec: 2     # همپوشانی قطعه‌ها تا عدد بین دو قطعه نصفه نشود (هر دو مسیر soundcard و sounddevice)
+  silence_peak: 0.001      # قطعه‌ی کم‌صداتر از این به STT فرستاده نمی‌شود
+  audio_device: ""         # نام دستگاه ضبط (بخشی از نام کافی است) یا ایندکس دستگاه ورودی؛ خالی = خودکار
+                           # فهرست دستگاه‌ها: داشبورد یا AudioCapture.list_loopback_devices()
+
+ai:
+  # provider: avalai | sinox | openai  (همه سازگار با OpenAI)
+  # هر provider می‌تواند max_retries (پیش‌فرض ۲) و retry_base_sec (پیش‌فرض ۱.۵) داشته باشد:
+  # خطاهای گذرای شبکه/429/5xx با backoff نمایی تلاش مجدد می‌شوند تا فریم و صدا از دست نروند
+  provider: "avalai"
+  avalai:
+    base_url: "https://api.avalai.ir/v1"
+    api_key: ""            # یا متغیر محیطی AVALAI_API_KEY
+    stt_model: "gpt-4o-transcribe"
+    vision_model: "gpt-5.6-sol"
+    text_model: "gpt-5.6-sol"
+  sinox:
+    base_url: "https://sinoxapi.com/v1"
+    api_key: ""
+    stt_model: "whisper-large-v3"
+    vision_model: "gpt-4o"
+    text_model: "claude-sonnet-4-5"
+  openai:
+    base_url: "https://api.openai.com/v1"
+    api_key: ""            # یا متغیر محیطی OPENAI_API_KEY
+    stt_model: "whisper-1"
+    vision_model: "gpt-4o"
+    text_model: "gpt-4o"
+
+analysis:
+  analysis_interval_min: 15     # خلاصه‌ی دوره‌ای (0=خاموش). خلاصه هرگز سیگنال معاملاتی نمی‌فرستد
+  publish_summaries: true
+  min_transcript_chars: 300
+  auto_end_idle_min: 8          # بدون گفتار معنادار و تغییر نمودار → پایان (هشدار در ۶۰٪ این زمان)
+  max_session_hours: 4          # سقف زمان جلسه
+
+live:
+  scan_interval_sec: 3          # فاصله‌ی عکس‌برداری از چارت
+  change_threshold: 1.8         # حساسیت تشخیص تغییر تصویر (کمتر = حساس‌تر)
+  cell_threshold: 12            # تغییر هر سلول برای محاسبه‌ی ناحیه‌ی تغییرکرده
+  global_change_frac: 0.45      # بیش از این سهم صفحه = زوم/اسکرول/تعویض صفحه
+  live_edge_frac: 0.10          # لبه‌ی راست (کندل جاری) که کم‌وزن می‌شود
+  live_edge_weight: 0.25
+  min_frame_std: 5              # کمتر = فریم سیاه/یکدست (قطع اشتراک صفحه)
+  frozen_after_sec: 90          # تصویر کاملاً ثابت بیش از این = فریز
+  vision_cooldown_sec: 10       # حداقل فاصله‌ی دو تحلیل با محرک تصویری
+  speech_cooldown_sec: 4        # حداقل فاصله با محرک گفتاری (سریع‌تر)
+  context_sec: 75               # گفتار چند ثانیه‌ی اخیر همراه فریم
+  vision_image_max_width: 1400  # عرض تصویر ارسالی به مدل (کوچک‌تر = سریع‌تر)
+  vision_prefilter:             # پیش‌فیلتر ارزان قبل از مدل اصلی (بخش ۲۲-۵ مستندات)
+    enabled: false              # ⚠ فقط با مدل کوچک/سریع روشن کنید؛ ممکن است رویداد از دست برود
+    model: ""                   # مثال: gpt-4o-mini
+  region: null                  # ناحیه‌ی چارت: {left: 0, top: 0, width: 1920, height: 1080}
+
+validation:
+  auto_publish_confidence: 0.8  # کمتر از این → بازبینی ادمین
+  min_confidence: 0.4           # کمتر از این → رد
+  min_management_confidence: 0.6
+  require_sl: true              # سیگنال بدون حد ضرر ارسال نمی‌شود (پیش‌نویس می‌ماند)
+  max_entry_distance_pct: 3.0
+  market_entry_tolerance_pct: 0.3
+  min_sl_pips: 2
+  rr_min: 0.2
+  rr_max: 20
+  publish_conditional: true     # سیگنال شرطی با برچسب ⚠️ ارسال شود
+  review_fallback: "label"      # بدون admin_chat: label=ارسال با برچسب «نیاز به تأیید» ، hold=ارسال نشود
+
+trades:
+  update_window_min: 30         # اصلاح ورود در این بازه = آپدیت همان سیگنال
+  update_entry_pct: 0.1         # اختلاف ورود کمتر از این درصد = همان سیگنال
+  draft_ttl_sec: 120            # پیش‌نویس ناقص تا این مدت منتظر تکمیل می‌ماند
+  review_ttl_sec: 300           # بازبینی بی‌پاسخ پس از این مدت منقضی
+
+market:
+  sources: ["mt5", "chart"]     # mt5 | http | chart (فقط mt5/http مستقل‌اند) — بدون MT5: ["http","chart"]
+  mt5_path: ""                  # مسیر terminal64.exe اگر چند ترمینال دارید؛ خالی = نصب پیش‌فرض
+  mt5_max_tick_age_sec: 300     # تیک کهنه‌تر از این = ترمینال قطع است
+  broker_symbols: {}            # مثال: {XAUUSD: "XAUUSDm"} — اگر خودش پیدا نکرد اینجا بنویسید
+  chart_price_max_age_sec: 120
+  stale_stream_pct: 1.0         # اختلاف بیش از این بین نمودار و بازار = ضبط قدیمی
+  closed_policy: "review"       # بازار بسته: review | block | allow
+  http:                         # منبع HTTP قیمت؛ preset رایگان فلزات: gold-api (بدون کلید)
+    preset: ""                  # "" = خاموش | gold-api | یا به‌جای آن url/json_path دستی بدهید
+    url: ""                     # مثال: https://api.example.com/{symbol}
+    json_path: "price"          # مسیر فیلد قیمت در پاسخ JSON (با . برای تودرتو)
+    symbol_map: {}              # مثال: {XAUUSD: XAU}
+
+symbols:
+  aliases: {}                   # نام‌های اختصاصی بروکر/کانال: {"XAUUSD.VIP": "XAUUSD"}
+  overrides: {}                 # مثال: {XAUUSD: {pip_size: 0.1}} — تعریف پیپ طلا در این کانال
+
+recording:
+  enabled: true                 # ضبط کامل جلسه برای Replay
+  keep_audio: true
+  keep_days: 14                 # جلسه‌های قدیمی‌تر حذف می‌شوند (0 = خاموش) — بخش ۲۲-۱۱ مستندات
+  compress_after_days: 3        # جلسه‌های قدیمی‌تر به zip فشرده می‌شوند (0 = خاموش)
+
+signal:
+  min_signal_fields: 3
+  send_opportunity_alerts: true
+  # قالب دلخواه پیام سیگنال (خالی = پیام پیش‌فرض). متغیرها:
+  # {symbol} {side} {order_type} {entry} {sl} {tps} {entries} {timeframe} {confidence} {evidence} {condition} {id} {time}
+  template: ""
+  # template: "⚡ {symbol} — {side} {order_type}\n🎯 ورود: {entry}\n🛑 SL: {sl}\n💰 {tps}\n🆔 {id} · {time}"
+
+dashboard:
+  host: "127.0.0.1"
+  port: 8765
+
+logging:
+  level: "INFO"
+  dir: "logs"

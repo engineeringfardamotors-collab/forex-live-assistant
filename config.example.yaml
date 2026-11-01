@@ -1,0 +1,163 @@
+# نمونه‌ی پیکربندی — این فایل را به config.yaml کپی و مقادیر را پر کنید
+# مرجع کامل کلیدها با پیش‌فرض‌ها: docs/DOCUMENTATION.md بخش ۲۰
+
+telegram:
+  # توکن ربات ارسال سیگنال (از @BotFather) یا BOT_TOKEN در .env
+  bot_token: "123456:ABC-..."
+  # شناسه‌ی کانال مقصد؛ مثال: "@my_forex_channel" یا "-1001234567890"
+  signal_channel: "@my_forex_channel"
+  # حساب شنونده‌ی گروه (Telethon) از my.telegram.org — مقادیر عمومی/اشتراکی امن نیستند
+  api_id: 123456
+  api_hash: "your_api_hash"
+  phone: "+98912..."
+  session_name: "assistant_listener"
+  # گروه‌های منبع لینک جلسات (chat_id عددی یا @username)
+  watch_groups:
+    - "@company_group"
+  # چت ادمین برای خطاها/بازبینی با دکمه‌ی تأیید؛ خالی = سیگنال مشکوک با برچسب «نیاز به تأیید» به کانال می‌رود
+  admin_chat: ""
+
+network:
+  proxy: ""                # socks5://… یا http://… ؛ خالی = اتصال مستقیم/TUN
+
+publisher:
+  dry_run: true            # true = هیچ پیامی به کانال واقعی نمی‌رود (فقط لاگ)
+  delay_note_sec: 60       # بالاتر از این → «با تأخیر …» در پیام درج می‌شود
+  drop_after_sec: 3600     # پیام کانال کهنه‌تر از این ارسال نمی‌شود (فقط به ادمین)
+
+health:
+  check_interval_sec: 5
+  black_after_sec: 30      # فریم سیاه بیش از این = هشدار
+  frozen_after_sec: 30     # فریم ثابت بیش از این = هشدار
+  move_tolerance_px: 8     # تلورانس جابه‌جایی پنجره
+  prevent_sleep: true      # در طول جلسه ویندوز به خواب نرود
+
+meeting:
+  zoom_password: ""
+  display_name: "Assistant"
+  use_browser: true
+  headless: false
+  join_timeout_sec: 45
+  manual_wait_sec: 600
+  user_data_dir: "./browser_profile"
+  browser_channel: ""      # chrome / msedge / خالی=خودکار
+  reconnect:               # قطعی جلسه → ورود مجدد خودکار
+    enabled: true
+    max_attempts: 3        # سهمیه پس از ۱۰ دقیقه پایداری تازه می‌شود
+    wait_sec: 20
+    manual_join_wait_sec: 45
+
+capture:
+  screenshot_interval_sec: 30
+  max_frames_per_analysis: 6
+  audio_sample_rate: 16000
+  audio_chunk_sec: 10      # قطعه‌ی کوتاه‌تر = واکنش سریع‌تر (هزینه‌ی STT بیشتر)
+  audio_overlap_sec: 2     # همپوشانی قطعه‌ها (هر دو مسیر soundcard و sounddevice)
+  silence_peak: 0.001
+  audio_device: ""         # نام دستگاه ضبط (بخشی از نام کافی است)؛ خالی = خودکار
+
+ai:
+  provider: "avalai"       # avalai | sinox | openai
+  # هر provider می‌تواند max_retries (پیش‌فرض ۲) و retry_base_sec (پیش‌فرض ۱.۵) داشته باشد
+  avalai:
+    base_url: "https://api.avalai.ir/v1"
+    api_key: ""            # یا متغیر محیطی AVALAI_API_KEY
+    stt_model: "gpt-4o-transcribe"
+    vision_model: "gpt-5.6-sol"
+    text_model: "gpt-5.6-sol"
+  sinox:
+    base_url: "https://sinoxapi.com/v1"
+    api_key: "sk-..."
+    stt_model: "whisper-large-v3"
+    vision_model: "gpt-4o"
+    text_model: "claude-sonnet-4-5"
+  openai:
+    base_url: "https://api.openai.com/v1"
+    api_key: "sk-..."
+    stt_model: "whisper-1"
+    vision_model: "gpt-4o"
+    text_model: "gpt-4o"
+
+analysis:
+  analysis_interval_min: 15   # خلاصه‌ی دوره‌ای (0=خاموش)؛ خلاصه هرگز سیگنال نمی‌فرستد
+  publish_summaries: true
+  min_transcript_chars: 300
+  auto_end_idle_min: 8        # پایان خودکار پس از بی‌فعالیتی
+  max_session_hours: 4
+
+live:
+  scan_interval_sec: 3
+  change_threshold: 1.8
+  cell_threshold: 12
+  global_change_frac: 0.45
+  live_edge_frac: 0.10
+  live_edge_weight: 0.25
+  min_frame_std: 5
+  frozen_after_sec: 90
+  vision_cooldown_sec: 10
+  speech_cooldown_sec: 4
+  context_sec: 75
+  vision_image_max_width: 1400
+  vision_prefilter:           # پیش‌فیلتر ارزان (اختیاری؛ ممکن است رویداد از دست بدهد)
+    enabled: false
+    model: ""                 # مثال: gpt-4o-mini
+  region: null                # ناحیه‌ی چارت (با --pick-region ساخته می‌شود)
+
+validation:
+  auto_publish_confidence: 0.8
+  min_confidence: 0.4
+  min_management_confidence: 0.6
+  require_sl: true
+  max_entry_distance_pct: 3.0
+  market_entry_tolerance_pct: 0.3
+  min_sl_pips: 2
+  rr_min: 0.2
+  rr_max: 20
+  publish_conditional: true
+  review_fallback: "label"    # بدون admin_chat: label یا hold
+
+trades:
+  update_window_min: 30
+  update_entry_pct: 0.1
+  draft_ttl_sec: 120
+  review_ttl_sec: 300
+  persist: true               # بازیابی معاملات باز پس از ری‌استارت/کرش (session_data/trades.json)
+  restore_max_gap_min: 120    # فایل وضعیت قدیمی‌تر از این → بازیابی نشود (توقف کنسول/خاموشی = کرش حساب می‌شود)
+
+market:
+  sources: ["mt5", "chart"]   # بدون MT5: ["http", "chart"]
+  cache_sec: 2                # عمر کش قیمت؛ کلاینت HTTP پایاست (بدون handshake تکراری)
+  mt5_path: ""
+  mt5_max_tick_age_sec: 300
+  broker_symbols: {}
+  chart_price_max_age_sec: 120
+  stale_stream_pct: 1.0
+  closed_policy: "review"
+  http:
+    preset: ""                # "" | gold-api (رایگان بدون کلید برای XAUUSD/XAGUSD)
+    url: ""                   # یا الگوی دستی: https://.../{symbol}
+    json_path: "price"
+    symbol_map: {}
+
+symbols:
+  aliases: {}                 # {"XAUUSD.VIP": "XAUUSD"}
+  overrides: {}               # {XAUUSD: {pip_size: 0.1}}
+
+recording:
+  enabled: true
+  keep_audio: true
+  keep_days: 14               # حذف جلسه‌های قدیمی‌تر (0=خاموش)
+  compress_after_days: 3      # فشرده‌سازی جلسه‌های قدیمی‌تر به zip (0=خاموش)
+
+signal:
+  min_signal_fields: 3
+  send_opportunity_alerts: true
+  template: ""                # قالب دلخواه پیام؛ متغیرها: {symbol} {side} {order_type} {entry} {sl} {tps} {entries} {timeframe} {confidence} {evidence} {condition} {id} {time}
+
+dashboard:
+  host: "127.0.0.1"
+  port: 8765
+
+logging:
+  level: "INFO"
+  dir: "logs"
